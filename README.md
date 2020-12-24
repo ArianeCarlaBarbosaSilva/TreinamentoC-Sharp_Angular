@@ -1,0 +1,1 @@
+Repositório para treinamento do Curso de Desenvolvimento Web full-Stack com Asp.Net Core Web API, Angular e Entity Framework Core com C#. 
