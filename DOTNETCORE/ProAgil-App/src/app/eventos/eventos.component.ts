@@ -23,12 +23,16 @@ export class EventosComponent implements OnInit {
   eventos: Evento[];
   evento: Evento;
   modoSalvar = 'post';
-  imagemLargura: number = 200;
+  imagemLargura: number = 50;
   imagemMargem: number = 2;
   mostrarImagem: boolean = false;
   registerForm: FormGroup;
   bodyDeletarEvento = '';
-  
+
+  file: File;
+  fileNameToUpdate: string;
+  dataAtual: string;
+
   _filtroLista: string;
   
   constructor(
@@ -61,10 +65,13 @@ export class EventosComponent implements OnInit {
   }
 
   editarEvento(evento: Evento, template: any) {
-    this.modoSalvar = 'put';
+    this.modoSalvar = 'put'; //porque vamos atualizar
     this.openModal(template);
-    this.evento = evento;
-    this.registerForm.patchValue(evento);
+    this.evento = Object.assign({}, evento); //copiar as informações dentro do evento para um novo objeto...
+    this.fileNameToUpdate = evento.imagemURL.toString();
+    this.evento.imagemURL = ''; //...e usar o elemento do atributo da classe pois o evento que recebemos como parametro
+    this.registerForm.patchValue(this.evento); //está sofrendo um binding com o html. Aqui queremos desassociar os dois
+    //assim, quando limpamos a imagem '' não estamos limpando a do html mas sim a cópia que fizemos dele.
   }
 
   novoEvento(template: any) {
@@ -105,10 +112,50 @@ export class EventosComponent implements OnInit {
     });
   }
 
+  onFileChange(event) {
+    const reader = new FileReader();
+
+    if (event.target.files && event.target.files.length) {
+      this.file = event.target.files;
+    }
+  }
+
+  uploadImagem() {
+    if (this.modoSalvar === 'post') {
+      /* imagemURL => "c:\fakeFolder\xxxx.jpg" => Dando um split na \, o nome do arquivo fica
+      nomeArquivo = [c:, fakeFolder, xxxx.jpg] => Como o que interessa é o nome do arquivo
+      pegamos a 3a posiçao do array [2] */
+      const nomeArquivo = this.evento.imagemURL.split('\\', 3);
+      this.evento.imagemURL = nomeArquivo[2];
+
+      //chamar o save do arquivo
+      this.eventoService.postUpload(this.file, nomeArquivo[2])
+        .subscribe(
+          () => {
+            this.dataAtual = new Date().getMilliseconds().toString();
+            this.getEventos();
+          }
+        );
+
+    } else { //realizando um put update
+      this.evento.imagemURL = this.fileNameToUpdate; //para salvar o nome da imagem no BD
+      this.eventoService.postUpload(this.file, this.fileNameToUpdate)
+        .subscribe(
+          () => {
+            this.dataAtual = new Date().getMilliseconds().toString();
+            this.getEventos();
+          }
+        );
+    }
+  }
+
   salvarAlteracao(template: any) {
     if (this.registerForm.valid) {
       if (this.modoSalvar === 'post') {
         this.evento = Object.assign({}, this.registerForm.value);
+
+        this.uploadImagem();
+
         this.eventoService.postEvento(this.evento).subscribe(
           (novoEvento: Evento) => {
             console.log(novoEvento);
@@ -121,6 +168,9 @@ export class EventosComponent implements OnInit {
         );
       } else {
         this.evento = Object.assign({id: this.evento.id}, this.registerForm.value);
+
+        this.uploadImagem();
+
         this.eventoService.putEvento(this.evento).subscribe(
           () => {
             template.hide();
