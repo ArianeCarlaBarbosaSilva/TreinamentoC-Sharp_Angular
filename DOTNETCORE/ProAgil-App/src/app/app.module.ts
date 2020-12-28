@@ -1,6 +1,7 @@
+import { AuthInterceptor } from './auth/auth.interceptor';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 
@@ -22,17 +23,23 @@ import { PalestrantesComponent } from './palestrantes/palestrantes.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ContatosComponent } from './contatos/contatos.component';
 import { TituloComponent } from './_shared/titulo/titulo.component';
+import { LoginComponent } from './user/login/login.component';
+import { RegistrationComponent } from './user/registration/registration.component';
+import { UserComponent } from './user/user.component';
 
 @NgModule({
-  declarations: [				
-    AppComponent,
-    NavComponent,
-    EventosComponent,
-    PalestrantesComponent,
-    DashboardComponent,
-    ContatosComponent,
-    TituloComponent,
-    DateTimeFormatPipePipe
+  declarations: [					
+      AppComponent,
+      NavComponent,
+      EventosComponent,
+      PalestrantesComponent,
+      DashboardComponent,
+      ContatosComponent,
+      TituloComponent,
+      UserComponent,
+      LoginComponent,
+      RegistrationComponent,
+      DateTimeFormatPipePipe
    ],
   imports: [
     BrowserModule,
@@ -42,13 +49,22 @@ import { TituloComponent } from './_shared/titulo/titulo.component';
     BsDatepickerModule.forRoot(),
     TooltipModule.forRoot(),
     ModalModule.forRoot(),
-    ToastrModule.forRoot(),
+    ToastrModule.forRoot({
+      timeOut: 3000,
+      preventDuplicates: true,
+      progressBar: true
+    }),
     FormsModule,
     ReactiveFormsModule,
     AppRoutingModule
   ],
   providers: [
-    EventoService
+    EventoService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
   ],
   bootstrap: [AppComponent]
 })
