@@ -130,7 +130,7 @@
                 <input type="text" class="form-control" 
                 bsDatepicker 
                 value="{{evento?.dataEvento | DateTimeFormatPipe}}"
-                [(ngModel)]="evento.dataEvento"
+                [(ngModel)]="dataEvento"
                 [bsConfig]="{ dateInputFormat : 'DD/MM/YYYY hh:mm' }"
                 [ngClass]="{'is-invalid': registerForm.get('dataEvento').errors 
                 && registerForm.get('dataEvento').touched}"

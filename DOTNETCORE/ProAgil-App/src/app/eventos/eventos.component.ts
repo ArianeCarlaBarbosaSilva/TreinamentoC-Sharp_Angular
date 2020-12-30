@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { EventoService } from '../_services/evento.service';
 import { Evento } from '../_models/Evento';
-import { BsModalService } from 'ngx-bootstrap/modal';
 import { defineLocale, ptBrLocale } from 'ngx-bootstrap/chronos';
 import { BsLocaleService } from "ngx-bootstrap/datepicker";
 import { ToastrService } from "ngx-toastr";
@@ -21,7 +20,7 @@ export class EventosComponent implements OnInit {
 
   eventosFiltrados: Evento[];
   eventos: Evento[];
-  evento: Evento;
+  evento: Evento = new Evento();
   modoSalvar = 'post';
   imagemLargura: number = 50;
   imagemMargem: number = 2;
@@ -37,7 +36,6 @@ export class EventosComponent implements OnInit {
   
   constructor(
     private eventoService: EventoService,
-    private modalService: BsModalService,
     private localeService: BsLocaleService,
     private toastr: ToastrService,
     private fb: FormBuilder,
